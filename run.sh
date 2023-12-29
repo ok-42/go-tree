@@ -1,2 +1,2 @@
 #!/usr/bin/bash
-go build -o build/ main.go && ./build/main.exe .
+go build -o build/got main.go && ./build/got .
