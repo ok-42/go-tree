@@ -22,9 +22,9 @@
 |-- main.go         C              K
 .-- test            F              L
     |-- dir0        FC             0
-	|-- dir1        FC             0K
-	|   |-- file    FCC            0IK
-	|   .-- file    FCF            0IL
+    |-- dir1        FC             0K
+    |   |-- file    FCC            0IK
+    |   .-- file    FCF            0IL
     .-- dir2        FF             0L
 ```
 
