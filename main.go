@@ -32,6 +32,10 @@ const S_K string = "\u251C"
 // Box drawings light up and right
 const S_L string = "\u2514"
 
+const BLUE string = "\033[1;34m"
+const GREEN string = "\033[1;32m"
+const RESET_COLOUR string = "\033[0m"
+
 func read(path string, final []bool) {
 	entries, err := os.ReadDir(path)
 	if err != nil {
@@ -39,8 +43,15 @@ func read(path string, final []bool) {
 	}
 	lenEntries := len(entries)
 	for index, entry := range entries {
+		isDir := entry.IsDir()
 		isFinal := index == lenEntries-1
+		var colouredName string
 		var name string = entry.Name()
+		if isDir {
+			colouredName = BLUE + name + RESET_COLOUR
+		} else {
+			colouredName = name
+		}
 		var final_ = append(final, isFinal)
 		n := len(final_)
 		var out string
@@ -60,8 +71,8 @@ func read(path string, final []bool) {
 				}
 			}
 		}
-		fmt.Println(out+"\u2500\u2500", name)
-		if entry.Type().IsDir() && !contains(ignorePaths, name) {
+		fmt.Println(out+"\u2500\u2500", colouredName)
+		if isDir && !contains(ignorePaths, name) {
 			var newPath string
 			if path == "." {
 				newPath = name
