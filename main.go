@@ -29,16 +29,19 @@ func read(path string, level int) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	for _, entry := range entries {
+	lenEntries := len(entries)
+	for index, entry := range entries {
+		isFinal := index == lenEntries-1
 		var name string = entry.Name()
-		var indent string
-		if level == 0 {
-			indent = strings.Repeat(" ", level)
-		} else {
-			indent = "\u2502" + strings.Repeat(" ", level-1)
-		}
+		var indent string = strings.Repeat("\u2502   ", level)
 		fmt.Print(indent)
-		fmt.Println("\u251C\u2500\u2500", name)
+		var finalOrContinue string
+		if isFinal {
+			finalOrContinue = "\u2514"
+		} else {
+			finalOrContinue = "\u251C"
+		}
+		fmt.Println(finalOrContinue+"\u2500\u2500", name)
 		if entry.Type().IsDir() && !contains(ignorePaths, name) {
 			var newPath string
 			if path == "." {
@@ -46,9 +49,8 @@ func read(path string, level int) {
 			} else {
 				newPath = path + "/" + name
 			}
-			read(newPath, level+4)
+			read(newPath, level+1)
 		}
-		// fmt.Println(indent, "\u2502")
 	}
 }
 
