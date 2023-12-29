@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
 )
 
 // https://stackoverflow.com/a/10485970
@@ -24,7 +23,16 @@ var ignorePaths = []string{
 	"venv",
 }
 
-func read(path string, level int) {
+// Box drawings light vertical
+const S_I string = "\u2502"
+
+// Box drawings light vertical and right
+const S_K string = "\u251C"
+
+// Box drawings light up and right
+const S_L string = "\u2514"
+
+func read(path string, final []bool) {
 	entries, err := os.ReadDir(path)
 	if err != nil {
 		fmt.Println(err)
@@ -33,15 +41,26 @@ func read(path string, level int) {
 	for index, entry := range entries {
 		isFinal := index == lenEntries-1
 		var name string = entry.Name()
-		var indent string = strings.Repeat("\u2502   ", level)
-		fmt.Print(indent)
-		var finalOrContinue string
-		if isFinal {
-			finalOrContinue = "\u2514"
-		} else {
-			finalOrContinue = "\u251C"
+		var final_ = append(final, isFinal)
+		n := len(final_)
+		var out string
+		for ind, value := range final_ {
+			if ind != n-1 {
+				if value {
+					out += " "
+				} else {
+					out += S_I
+				}
+				out += "   "
+			} else {
+				if value {
+					out += S_L
+				} else {
+					out += S_K
+				}
+			}
 		}
-		fmt.Println(finalOrContinue+"\u2500\u2500", name)
+		fmt.Println(out+"\u2500\u2500", name)
 		if entry.Type().IsDir() && !contains(ignorePaths, name) {
 			var newPath string
 			if path == "." {
@@ -49,12 +68,12 @@ func read(path string, level int) {
 			} else {
 				newPath = path + "/" + name
 			}
-			read(newPath, level+1)
+			read(newPath, final_)
 		}
 	}
 }
 
 func main() {
 	var path string = os.Args[1]
-	read(path, 0)
+	read(path, []bool{})
 }
