@@ -31,14 +31,20 @@ func read(path string, level int) {
 	}
 	for _, entry := range entries {
 		var name string = entry.Name()
-		var indent string = strings.Repeat(" ", level)
-		fmt.Println(indent, "\u251C\u2500\u2500", name)
+		var indent string
+		if level == 0 {
+			indent = strings.Repeat(" ", level)
+		} else {
+			indent = "\u2502" + strings.Repeat(" ", level-1)
+		}
+		fmt.Print(indent)
+		fmt.Println("\u251C\u2500\u2500", name)
 		if entry.Type().IsDir() && !contains(ignorePaths, name) {
 			var newPath string
 			if path == "." {
 				newPath = name
 			} else {
-				newPath = path + name
+				newPath = path + "/" + name
 			}
 			read(newPath, level+4)
 		}
