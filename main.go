@@ -74,6 +74,11 @@ func read(path string, final []bool) {
 }
 
 func main() {
-	var path string = os.Args[1]
+	var path string
+	if len(os.Args) == 1 {
+		path = "."
+	} else {
+		path = os.Args[1]
+	}
 	read(path, []bool{})
 }
