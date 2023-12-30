@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 // https://stackoverflow.com/a/10485970
@@ -52,26 +53,20 @@ func read(path string, final []bool) {
 		} else {
 			colouredName = name
 		}
-		var final_ = append(final, isFinal)
-		n := len(final_)
-		var out string
-		for ind, value := range final_ {
-			if ind != n-1 {
-				if value {
-					out += " "
-				} else {
-					out += S_I
-				}
-				out += "   "
+		var sb strings.Builder
+		for _, value := range final {
+			if value {
+				sb.WriteString("    ")
 			} else {
-				if value {
-					out += S_L
-				} else {
-					out += S_K
-				}
+				sb.WriteString(S_I + "   ")
 			}
 		}
-		fmt.Println(out+"\u2500\u2500", colouredName)
+		if isFinal {
+			sb.WriteString(S_L)
+		} else {
+			sb.WriteString(S_K)
+		}
+		fmt.Println(sb.String()+"\u2500\u2500", colouredName)
 		if isDir && !contains(ignorePaths, name) {
 			var newPath string
 			if path == "." {
@@ -79,7 +74,7 @@ func read(path string, final []bool) {
 			} else {
 				newPath = path + "/" + name
 			}
-			read(newPath, final_)
+			read(newPath, append(final, isFinal))
 		}
 	}
 }
