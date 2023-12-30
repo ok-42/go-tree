@@ -7,8 +7,8 @@ import (
 )
 
 // https://stackoverflow.com/a/10485970
-func contains[anyType int | string](s []anyType, e anyType) bool {
-	for _, a := range s {
+func contains[anyType int | string](s *[]anyType, e anyType) bool {
+	for _, a := range *s {
 		if a == e {
 			return true
 		}
@@ -67,7 +67,7 @@ func read(path string, final []bool) {
 			sb.WriteString(S_K)
 		}
 		fmt.Println(sb.String()+"\u2500\u2500", colouredName)
-		if isDir && !contains(ignorePaths, name) {
+		if isDir && !contains(&ignorePaths, name) {
 			var newPath string
 			if path == "." {
 				newPath = name
