@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -14,6 +15,16 @@ func contains[anyType int | string](s *[]anyType, e anyType) bool {
 		}
 	}
 	return false
+}
+
+// https://stackoverflow.com/a/37563128
+func filter[T any](ss []T, test func(T) bool) (ret []T) {
+	for _, s := range ss {
+		if test(s) {
+			ret = append(ret, s)
+		}
+	}
+	return
 }
 
 var ignorePaths = []string{
@@ -37,8 +48,30 @@ const BLUE string = "\033[1;34m"
 const GREEN string = "\033[1;32m"
 const RESET_COLOUR string = "\033[0m"
 
+// Copy of os.ReadDir
+func osReadDir(name string, sort_ bool) ([]os.DirEntry, error) {
+	f, err := os.Open(name)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	dirs, err := f.ReadDir(-1)
+	if sort_ {
+		sort.Slice(dirs, func(i, j int) bool {
+			if dirs[i].IsDir() && !dirs[j].IsDir() {
+				return true
+			} else if !dirs[i].IsDir() && dirs[j].IsDir() {
+				return false
+			} else {
+				return dirs[i].Name() < dirs[j].Name()
+			}
+		})
+	}
+	return dirs, err
+}
+
 func read(path string, final []bool) {
-	entries, err := os.ReadDir(path)
+	entries, err := osReadDir(path, true)
 	if err != nil {
 		fmt.Println(err)
 	}
