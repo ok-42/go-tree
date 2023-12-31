@@ -67,6 +67,9 @@ func osReadDir(name string, sort_ bool) ([]os.DirEntry, error) {
 			}
 		})
 	}
+	dirs = filter[os.DirEntry](dirs, func(de os.DirEntry) bool {
+		return !contains[string](&ignorePaths, de.Name())
+	})
 	return dirs, err
 }
 
@@ -100,7 +103,7 @@ func read(path string, final []bool) {
 			sb.WriteString(S_K)
 		}
 		fmt.Println(sb.String()+"\u2500\u2500", colouredName)
-		if isDir && !contains(&ignorePaths, name) {
+		if isDir {
 			var newPath string
 			if path == "." {
 				newPath = name
