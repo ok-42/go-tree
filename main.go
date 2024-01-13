@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"slices"
@@ -39,7 +40,7 @@ const BLUE string = "\033[1;34m"
 const GREEN string = "\033[1;32m"
 const RESET_COLOUR string = "\033[0m"
 
-// Copy of os.ReadDir
+// Modified copy of os.ReadDir
 func osReadDir(name string, sort_ bool) ([]os.DirEntry, error) {
 	f, err := os.Open(name)
 	if err != nil {
@@ -58,8 +59,37 @@ func osReadDir(name string, sort_ bool) ([]os.DirEntry, error) {
 			}
 		})
 	}
+
+	// If .gitignore file is found, ignore its content
+	var localPaths []string
+	if slices.ContainsFunc[[]os.DirEntry, os.DirEntry](
+		dirs, func(de os.DirEntry) bool { return de.Name() == ".gitignore" },
+	) {
+		gitIgnore, err := os.Open(name + "/.gitignore")
+		if err != nil {
+			return nil, err
+		}
+		defer gitIgnore.Close()
+		var newPaths []string
+		scanner := bufio.NewScanner(gitIgnore)
+		for scanner.Scan() {
+			line := scanner.Text()
+			if len(line) > 0 && !strings.HasPrefix(line, "#") {
+				if strings.HasPrefix(line, "/") {
+					line = line[1:]
+				}
+				if strings.HasSuffix(line, "/") {
+					line = line[:len(line)-1]
+				}
+				newPaths = append(newPaths, line)
+			}
+		}
+		localPaths = append(ignorePaths, newPaths...)
+	} else {
+		localPaths = ignorePaths
+	}
 	dirs = filter[os.DirEntry](dirs, func(de os.DirEntry) bool {
-		return !slices.Contains[[]string, string](ignorePaths, de.Name())
+		return !slices.Contains[[]string, string](localPaths, de.Name())
 	})
 	return dirs, err
 }
