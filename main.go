@@ -3,19 +3,10 @@ package main
 import (
 	"fmt"
 	"os"
+	"slices"
 	"sort"
 	"strings"
 )
-
-// https://stackoverflow.com/a/10485970
-func contains[anyType int | string](s *[]anyType, e anyType) bool {
-	for _, a := range *s {
-		if a == e {
-			return true
-		}
-	}
-	return false
-}
 
 // https://stackoverflow.com/a/37563128
 func filter[T any](ss []T, test func(T) bool) (ret []T) {
@@ -68,7 +59,7 @@ func osReadDir(name string, sort_ bool) ([]os.DirEntry, error) {
 		})
 	}
 	dirs = filter[os.DirEntry](dirs, func(de os.DirEntry) bool {
-		return !contains[string](&ignorePaths, de.Name())
+		return !slices.Contains[[]string, string](ignorePaths, de.Name())
 	})
 	return dirs, err
 }
